@@ -24,11 +24,18 @@ export interface Env {
   API_KEY: string;
 }
 
+export interface PassLocation {
+  latitude: number;
+  longitude: number;
+  relevantText?: string;
+}
+
 export interface PassRequest {
   memberId: string;
   firstName: string;
   lastName: string;
   pinCode?: string;
+  locations?: PassLocation[];
 }
 
 export default {
@@ -134,6 +141,15 @@ export function buildPassJson(
     foregroundColor: "rgb(255, 255, 255)",
     backgroundColor: "rgb(38, 65, 43)",
     labelColor: "rgb(200, 220, 200)",
+    ...(data.locations && data.locations.length > 0
+      ? {
+          locations: data.locations.map((loc) => ({
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            ...(loc.relevantText ? { relevantText: loc.relevantText } : {}),
+          })),
+        }
+      : {}),
     barcodes: [
       {
         format: "PKBarcodeFormatPDF417",
